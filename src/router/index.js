@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../components/Login.vue'
+
 // 注册路由分支
 Vue.use(VueRouter)
 
