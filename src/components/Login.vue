@@ -4,16 +4,16 @@
       <div class="avatar">
         <img src="../assets/logo.png" alt="" />
       </div>
-      <el-form class="form_box" v-model="loginForm" label-width="0px">
-        <el-form-item>
-          <el-input v-model="loginForm.name" prefix-icon="iconfont icon-user"></el-input>
+      <el-form class="form_box" ref="loginFormRef" :rules="loginFormRules" :model="loginForm" label-width="0px">
+        <el-form-item prop="username">
+          <el-input v-model="loginForm.username" prefix-icon="iconfont icon-user"></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="password">
           <el-input type="password" v-model="loginForm.password" prefix-icon="iconfont icon-3702mima"></el-input>
         </el-form-item>
         <el-form-item class="btns">
           <el-button class="btn-1" type="primary">登录</el-button>
-          <el-button type="info">重置</el-button>
+          <el-button type="info" @click="loginFormReset">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -25,10 +25,28 @@ export default {
   name: 'login',
   data() {
     return {
+      // 表单数据双向绑定
       loginForm: {
-        name: 'zs',
+        username: 'zs',
         password: '111111'
+      },
+      // 定义 表单验证 规则
+      loginFormRules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, max: 10, message: '长度在3 - 10位', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, max: 20, message: '密码在6 - 20位', trigger: 'blur' }
+        ]
       }
+    }
+  },
+  methods: {
+    loginFormReset() {
+      // 获取 dom 对象
+      this.$refs.loginFormRef.resetFields()
     }
   }
 }
