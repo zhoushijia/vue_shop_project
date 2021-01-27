@@ -4,12 +4,12 @@
       <div class="avatar">
         <img src="../assets/logo.png" alt="" />
       </div>
-      <el-form class="form_box" label-width="0px">
+      <el-form class="form_box" v-model="loginForm" label-width="0px">
         <el-form-item>
-          <el-input prefix-icon="iconfont icon-user"></el-input>
+          <el-input v-model="loginForm.name" prefix-icon="iconfont icon-user"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-input prefix-icon="iconfont icon-3702mima"></el-input>
+          <el-input type="password" v-model="loginForm.password" prefix-icon="iconfont icon-3702mima"></el-input>
         </el-form-item>
         <el-form-item class="btns">
           <el-button class="btn-1" type="primary">登录</el-button>
@@ -21,7 +21,17 @@
 </template>
 
 <script>
-export default {}
+export default {
+  name: 'login',
+  data() {
+    return {
+      loginForm: {
+        name: 'zs',
+        password: '111111'
+      }
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
