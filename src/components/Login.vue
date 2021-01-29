@@ -12,7 +12,7 @@
           <el-input type="password" v-model="loginForm.password" prefix-icon="iconfont icon-3702mima"></el-input>
         </el-form-item>
         <el-form-item class="btns">
-          <el-button class="btn-1" type="primary">登录</el-button>
+          <el-button class="btn-1" type="primary" @click="login">登录</el-button>
           <el-button type="info" @click="loginFormReset">重置</el-button>
         </el-form-item>
       </el-form>
@@ -21,14 +21,16 @@
 </template>
 
 <script>
+// import 导出会缓存 这里的 axios 还是 main.js 中导出的 axios
+// import axios from 'axios'
 export default {
   name: 'login',
   data() {
     return {
       // 表单数据双向绑定
       loginForm: {
-        username: 'zs',
-        password: '111111'
+        username: 'admin',
+        password: '123456'
       },
       // 定义 表单验证 规则
       loginFormRules: {
@@ -47,6 +49,22 @@ export default {
     loginFormReset() {
       // 获取 dom 对象
       this.$refs.loginFormRef.resetFields()
+    },
+    login() {
+      // 整个表单进行校验
+      this.$refs.loginFormRef.validate(async (valid) => {
+        if (!valid) return
+        // 发送 axios 请求 给 data 起别名 this.loginForm 表单数据
+        // const { data: res } = await axios.post('login', this.loginForm)
+        const { data: res } = await this.$http.post('login', this.loginForm)
+        if (res.meta.status !== 200) return this.$message.error('登陆失败')
+        // 跳出 element ui 弹框
+        this.$message.success('登录成功')
+        // 将令牌存储到 sessionStorage 中
+        window.sessionStorage.setItem('token', res.data.token)
+        // 跳转到 Home 页面
+        this.$router.push('/home')
+      })
     }
   }
 }
