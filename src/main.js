@@ -18,7 +18,7 @@ axios.interceptors.request.use((config) => {
 })
 // 响应拦截器 拦截无效token
 axios.interceptors.response.use((res) => {
-  if (res.data.meta.msg === '无效的token' && res.data.meta.status === 400) {
+  if (res.data.meta.msg === '无效token' && res.data.meta.status === 400) {
     window.sessionStorage.clear()
     // 原生的 hash 地址
     location.href = '/#/login'
