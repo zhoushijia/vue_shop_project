@@ -52,6 +52,11 @@ export default {
     },
     login() {
       // 整个表单进行校验
+      /*  try {
+        const valid = await this.$refs.loginFormRef.validate()
+      } catch (error) {
+        return error
+      } */
       this.$refs.loginFormRef.validate(async (valid) => {
         if (!valid) return
         // 发送 axios 请求 给 data 起别名 this.loginForm 表单数据
