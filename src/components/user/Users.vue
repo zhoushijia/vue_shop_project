@@ -50,12 +50,14 @@ export default {
     }
   },
   methods: {
+    //   调用接口 获取用户
     async getUserlist() {
       const { data: res } = await this.$http.get('users', { params: this.queryUser })
       if (res.meta.status !== 200) return this.$message.error('获取用户列表失败')
       this.userlist = res.data.users
     }
   },
+  // 获取用户列表
   created() {
     this.getUserlist()
   }
