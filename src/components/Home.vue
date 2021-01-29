@@ -13,16 +13,16 @@
       <el-aside :width="isCollapse ? '64px' : '200px'" class="home_aside">
         <div class="toggle-button" @click="toggleCollapse">|||</div>
         <!-- 主菜单 -->
-        <!-- 1. active-text-color 选中高亮颜色 2. submenu是否只保持一个子菜单的展开unique-opened 3. collapse-transition 必须动态绑定-->
-        <el-menu background-color="#333744" text-color="#fff" active-text-color="skyblue" unique-opened :collapse-transition="false" :collapse="isCollapse">
-          <!-- 子菜单 -->
+        <!-- 1. active-text-color 选中高亮颜色 2. submenu是否只保持一个子菜单的展开unique-opened 3. collapse-transition 必须动态绑定 4. collapse 折叠 5. router 路由链接激活 6. default-active当前激活菜单的 index -->
+        <el-menu background-color="#333744" text-color="#fff" active-text-color="skyblue" unique-opened :collapse-transition="false" :collapse="isCollapse" router :default-active="activePath">
+          <!-- 一级菜单 -->
           <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id">
             <template slot="title">
               <i :class="item.icon"></i>
               <span>{{ item.authName }}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item :index="subitem.id + ''" v-for="subitem in item.children" :key="subitem.id">
+            <el-menu-item @click="getActivePath('/' + subitem.path)" :index="'/' + subitem.path" v-for="subitem in item.children" :key="subitem.id">
               <i class="el-icon-menu"></i>
               <span>{{ subitem.authName }}</span>
             </el-menu-item>
@@ -41,11 +41,14 @@ export default {
     return {
       menuList: [],
       icons: ['iconfont icon-user', 'iconfont icon-tijikongjian', 'iconfont icon-shangpin', 'iconfont icon-danju', 'iconfont icon-baobiao'],
-      isCollapse: false
+      isCollapse: false,
+      activePath: ''
     }
   },
   created() {
     this.getMenuList()
+    // 页面刷新后 获得前一次默认点击效果
+    this.activePath = window.sessionStorage.getItem('activePath')
   },
   methods: {
     // 实现退出功能
@@ -69,6 +72,13 @@ export default {
     // 实现侧边栏的折叠效果
     toggleCollapse() {
       this.isCollapse = !this.isCollapse
+    },
+    // 侧边栏本地持久化 保存默认状态
+    getActivePath(activePath) {
+      // 存储到sessionStorage中
+      window.sessionStorage.setItem('activePath', activePath)
+      // 保证点击后的高亮效果
+      this.activePath = activePath
     }
   }
 }
