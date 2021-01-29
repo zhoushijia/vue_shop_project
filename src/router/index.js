@@ -16,4 +16,16 @@ const router = new VueRouter({
   routes
 })
 
+// 路由导航守卫
+router.beforeEach((to, from, next) => {
+  // 如果是到login页面,直接跳转
+  if (to.path === '/login') return next()
+  // 否则,获得 token 值 判断 token 是否正确
+  const tokenStr = window.sessionStorage.getItem('token')
+  // 如果没有token值或者不正确 跳转到token页面
+  if (!tokenStr) next('/login')
+  // 调用后端 核验 token 是否正确
+  next()
+})
+
 export default router
