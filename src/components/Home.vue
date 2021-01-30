@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import hub from '../utils/hub.js'
 export default {
   data() {
     return {
@@ -46,6 +47,7 @@ export default {
     }
   },
   created() {
+    hub.$on('getActivePath', this.getActivePath)
     this.getMenuList()
     // 页面刷新后 获得前一次默认点击效果
     this.activePath = window.sessionStorage.getItem('activePath')
@@ -80,6 +82,9 @@ export default {
       // 保证点击后的高亮效果
       this.activePath = activePath
     }
+  },
+  destroyed() {
+    hub.$off('getActivePath')
   }
 }
 </script>
