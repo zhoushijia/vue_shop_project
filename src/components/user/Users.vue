@@ -57,7 +57,7 @@
     </el-card>
 
     <!-- 用户对话框 -->
-    <el-dialog title="用户信息" :visible.sync="dialogVisible" width="50%">
+    <el-dialog title="用户信息" :visible.sync="dialogVisible" width="50%" @close="addUserResetClosed">
       <!-- 内容输入区 -->
       <el-form ref="addForm" :model="addFormUser" :rules="addFormRules" label-width="70px">
         <el-form-item label="用户名" prop="username">
@@ -76,7 +76,7 @@
       <!-- 底部按钮区 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="addUser">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -101,7 +101,7 @@ export default {
       if (regMobile.test(value)) {
         return cb()
       }
-      cb(new Error('请输入合法的邮箱'))
+      cb(new Error('请输入合法的电话号码'))
     }
     return {
       queryUser: {
@@ -111,6 +111,7 @@ export default {
       },
       userlist: [],
       total: 0,
+      // 控制对话框弹出关闭
       dialogVisible: false,
       addFormUser: {
         username: '',
@@ -118,6 +119,7 @@ export default {
         email: '',
         mobile: ''
       },
+      // 用户信息规则
       addFormRules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -164,6 +166,22 @@ export default {
         return this.$message.error('状态更新失败')
       }
       this.$message.success('状态更新成功')
+    },
+    // 监听对话框关闭事件 重置表单 处理尸体
+    addUserResetClosed() {
+      this.$refs.addForm.resetFields()
+    },
+    // 新增用户
+    addUser() {
+      this.$refs.addForm.validate(async (valid) => {
+        if (!valid) return
+        const { data: res } = await this.$http.post('users', this.addFormUser)
+        if (res.meta.status !== 201) return this.$message.error('用户添加失败')
+        this.$message.success('用户添加成功')
+        // 关闭对话框
+        this.dialogVisible = false
+        this.getUserlist()
+      })
     }
   },
   // 获取用户列表
