@@ -228,7 +228,7 @@ export default {
       // 根据 id 发请求
       const { data: res } = await this.$http.get('users/' + id)
       if (res.meta.status !== 200) return this.$message.error('获取用户信息失败')
-      this.$message.success('获取用户信息成功')
+      // this.$message.success('获取用户信息成功')
       this.editForm = res.data
       // 弹出修改用户对话框
       this.editDialogVisible = true
@@ -254,7 +254,14 @@ export default {
     },
     // 根据id删除用户
     async deleteUser(id) {
-      const { data: res } = await this.$http.delete('users' + id)
+      const confirmResult = await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch((err) => err)
+      if (confirmResult !== 'confirm') return this.$message.info('已取消删除用户')
+      // 发请求删除用户
+      const { data: res } = await this.$http.delete('users/' + id)
       if (res.meta.status !== 200) return this.$message.error('删除用户失败')
       this.$message.success('删除用户成功')
       this.getUserlist()
