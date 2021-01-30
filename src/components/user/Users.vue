@@ -42,7 +42,7 @@
               <!-- 修改按钮  -->
               <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row.id)"></el-button>
               <!-- 删除按钮  -->
-              <el-button type="warning" icon="el-icon-delete" size="mini"></el-button>
+              <el-button type="warning" icon="el-icon-delete" size="mini" @click="deleteUser(scope.row.id)"></el-button>
               <!-- 分配按钮 需要提示文本 tooltip -->
               <el-tooltip effect="dark" content="分配角色" :enterable="false" placement="top">
                 <el-button type="danger" icon="el-icon-setting" size="mini"></el-button>
@@ -251,6 +251,13 @@ export default {
         // 关闭对话框
         this.editDialogVisible = false
       })
+    },
+    // 根据id删除用户
+    async deleteUser(id) {
+      const { data: res } = await this.$http.delete('users' + id)
+      if (res.meta.status !== 200) return this.$message.error('删除用户失败')
+      this.$message.success('删除用户成功')
+      this.getUserlist()
     }
   },
   // 获取用户列表
