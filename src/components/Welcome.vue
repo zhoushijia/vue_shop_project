@@ -4,12 +4,12 @@
   </div>
 </template>
 <script>
-import hub from '../utils/hub.js'
+// import hub from '../utils/hub.js'
 export default {
   name: 'Welcome',
   created() {
     //##1 定义事件中心自定义事件
-    hub.$emit('getActivePath', '')
+    // hub.$emit('getActivePath', '')
   }
 }
 </script>

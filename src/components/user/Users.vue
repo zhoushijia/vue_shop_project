@@ -101,9 +101,14 @@
   </div>
 </template>
 <script>
-import hub from '../../utils/hub.js'
+// import hub from '../../utils/hub.js'
 export default {
   name: 'Users',
+  // 获取用户列表
+  created() {
+    this.getUserlist()
+    // hub.$emit('getActivePath', '/users')
+  },
   data() {
     // 邮箱验证规则
     const checkEmail = (rule, value, cb) => {
@@ -271,11 +276,6 @@ export default {
       this.$message.success('删除用户成功')
       this.getUserlist()
     }
-  },
-  // 获取用户列表
-  created() {
-    this.getUserlist()
-    hub.$emit('getActivePath', '/users')
   }
 }
 </script>

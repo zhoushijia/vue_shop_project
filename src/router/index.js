@@ -5,6 +5,8 @@ import Home from '../components/Home.vue'
 import Welcome from '../components/Welcome.vue'
 import Users from '../components/user/Users.vue'
 import Rights from '../components/power/Rights.vue'
+import Roles from '../components/power/Roles.vue'
+import hub from '../utils/hub.js'
 
 // 注册路由分支
 Vue.use(VueRouter)
@@ -19,7 +21,8 @@ const routes = [
     children: [
       { path: '/welcome', component: Welcome },
       { path: '/users', component: Users },
-      { path: '/rights', component: Rights }
+      { path: '/rights', component: Rights },
+      { path: '/roles', component: Roles }
     ]
   }
 ]
@@ -37,6 +40,7 @@ router.beforeEach((to, from, next) => {
   // 如果没有token值或者不正确 跳转到token页面
   if (!tokenStr) return next('/login')
   // 调用后端 核验 token 是否正确
+  hub.$emit('getActivePath', to.path)
   next()
 })
 
