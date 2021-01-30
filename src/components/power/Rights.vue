@@ -9,6 +9,7 @@
       <el-table :data="rightslist" style="width: 100%" stripe border>
         <el-table-column type="index" label="#"> </el-table-column>
         <el-table-column prop="authName" label="权限说明"> </el-table-column>
+        <el-table-column prop="path" label="访问路径"> </el-table-column>
         <el-table-column prop="level" label="权限层级">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.level === '1'">等级一</el-tag>
@@ -23,6 +24,7 @@
 <script>
 import hub from '../../utils/hub.js'
 export default {
+  name: 'Rights',
   created() {
     hub.$emit('getActivePath', '/rights')
     this.getRightslist()

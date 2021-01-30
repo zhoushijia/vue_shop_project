@@ -103,6 +103,7 @@
 <script>
 import hub from '../../utils/hub.js'
 export default {
+  name: 'Users',
   data() {
     // 邮箱验证规则
     const checkEmail = (rule, value, cb) => {

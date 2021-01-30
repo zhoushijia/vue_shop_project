@@ -24,7 +24,7 @@
 // import 导出会缓存 这里的 axios 还是 main.js 中导出的 axios
 // import axios from 'axios'
 export default {
-  name: 'login',
+  name: 'Login',
   data() {
     return {
       // 表单数据双向绑定

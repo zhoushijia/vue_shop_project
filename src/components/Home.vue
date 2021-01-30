@@ -38,6 +38,7 @@
 <script>
 import hub from '../utils/hub.js'
 export default {
+  name: 'Home',
   data() {
     return {
       menuList: [],
