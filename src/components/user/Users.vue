@@ -263,6 +263,10 @@ export default {
       // 发请求删除用户
       const { data: res } = await this.$http.delete('users/' + id)
       if (res.meta.status !== 200) return this.$message.error('删除用户失败')
+      // 解决分页删除时小 bug
+      if (this.userlist.length == 1) {
+        this.queryUser.pagenum = this.queryUser.pagenum > 1 ? this.queryUser.pagenum - 1 : 1
+      }
       this.$message.success('删除用户成功')
       this.getUserlist()
     }
