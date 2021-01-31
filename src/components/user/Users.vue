@@ -208,7 +208,7 @@ export default {
     }
   },
   methods: {
-    // 调用接口 获取所有用户
+    // #1 调用接口 获取所有用户
     async getUserlist() {
       const { data: res } = await this.$http.get('users', { params: this.queryUser })
       if (res.meta.status !== 200) return this.$message.error('获取用户列表失败')
@@ -225,7 +225,7 @@ export default {
       this.queryUser.pagenum = newPagenum
       this.getUserlist()
     },
-    //  监听状态事件 发起请求 开关状态切换
+    // #2 监听状态事件 发起请求 开关状态切换
     async switchChange(userInfo) {
       const { data: res } = await this.$http.put(`users/${userInfo.id}/state/${userInfo.mg_state}`)
       if (res.meta.status !== 200) {
@@ -234,6 +234,7 @@ export default {
       }
       this.$message.success('状态更新成功')
     },
+    // #3 增加用户
     // 监听对话框关闭事件 重置表单 处理尸体
     addDialogClosed() {
       this.$refs.addForm.resetFields()
@@ -250,7 +251,7 @@ export default {
         this.getUserlist()
       })
     },
-    // 编辑用户 editUser 和 editUserInfo
+    // #4 编辑用户 editUser 和 editUserInfo
     // 根据用户id查询用户信息
     async editUser(id) {
       // 根据 id 发请求
@@ -261,7 +262,7 @@ export default {
       // 弹出修改用户对话框
       this.editDialogVisible = true
     },
-    //?   监听编辑对话框 重置表单  ? 个人感觉这一步多余
+    // 监听编辑对话框 重置表单
     editDialogClosed() {
       this.$refs.editFormRef.resetFields()
     },
@@ -280,7 +281,7 @@ export default {
         this.editDialogVisible = false
       })
     },
-    // 根据id删除用户
+    // #5 根据id删除用户
     async deleteUser(id) {
       const confirmResult = await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -298,10 +299,10 @@ export default {
       this.$message.success('删除用户成功')
       this.getUserlist()
     },
+    // #6 给用户分配角色
     // 显示分配角色对话框
-    // 给用户分配角色
     async setRole(userInfo) {
-      // 存储用户信息，用来保存角色id
+      // 存储用户信息，用来保存用户id
       this.userInfo = userInfo
       // 获取所有角色列表
       const { data: res } = await this.$http.get('roles')

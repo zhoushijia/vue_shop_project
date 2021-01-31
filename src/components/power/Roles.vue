@@ -23,14 +23,14 @@
             <el-row :class="['tag_bottom', 'vcenter', index1 === 0 ? 'tag_top' : '']" v-for="(item1, index1) in scope.row.children" :key="item1.id">
               <!-- 一级权限 -->
               <el-col :span="5">
-                <el-tag closable>{{ item1.authName }}</el-tag>
+                <el-tag closable @close="removeRoleRight(scope.row, item1.id)">{{ item1.authName }}</el-tag>
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col :span="19">
                 <!-- 二级权限  -->
                 <el-row :class="['vcenter', index2 === 0 ? '' : 'tag_top']" v-for="(item2, index2) in item1.children" :key="item2.id">
                   <el-col :span="6">
-                    <el-tag type="success" closable @close="removeRoleRight(scope.row, item3.id)">{{ item2.authName }}</el-tag>
+                    <el-tag type="success" closable @close="removeRoleRight(scope.row, item2.id)">{{ item2.authName }}</el-tag>
                     <i class="el-icon-caret-right"></i>
                   </el-col>
                   <el-col :span="18">
