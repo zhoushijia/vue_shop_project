@@ -1,14 +1,47 @@
 <template>
   <div>
+    <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>角色管理</el-breadcrumb-item>
       <el-breadcrumb-item>角色列表</el-breadcrumb-item>
     </el-breadcrumb>
+    <!-- 卡片区 -->
     <el-card>
+      <el-row>
+        <el-col>
+          <el-button type="primary" @click="addRole">添加角色</el-button>
+        </el-col>
+      </el-row>
+      <!-- 表格区 -->
       <el-table :data="roleslist" style="width: 100%" stripe border>
         <!-- 展开行 -->
-        <el-table-column type="expand"> <template slot-scope=""></template></el-table-column>
+        <el-table-column type="expand">
+          <!-- 作用域插槽 -->
+          <template slot-scope="scope">
+            <!-- 栅格系统 -->
+            <el-row :class="['tag_bottom', 'vcenter', index1 === 0 ? 'tag_top' : '']" v-for="(item1, index1) in scope.row.children" :key="item1.id">
+              <!-- 一级权限 -->
+              <el-col :span="5">
+                <el-tag closable>{{ item1.authName }}</el-tag>
+                <i class="el-icon-caret-right"></i>
+              </el-col>
+              <el-col :span="19">
+                <!-- 二级权限  -->
+                <el-row :class="['vcenter', index2 === 0 ? '' : 'tag_top']" v-for="(item2, index2) in item1.children" :key="item2.id">
+                  <el-col :span="6">
+                    <el-tag type="success" closable @close="removeRoleRight(scope.row, item3.id)">{{ item2.authName }}</el-tag>
+                    <i class="el-icon-caret-right"></i>
+                  </el-col>
+                  <el-col :span="18">
+                    <!-- 三级权限 -->
+                    <el-tag type="warning" v-for="item3 in item2.children" :key="item3.id" closable @close="removeRoleRight(scope.row, item3.id)">{{ item3.authName }}</el-tag>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+          </template>
+        </el-table-column>
         <!-- 主体 -->
         <el-table-column type="index" label="#"> </el-table-column>
         <el-table-column prop="roleName" label="角色名称"> </el-table-column>
@@ -22,6 +55,24 @@
         </el-table-column>
       </el-table>
     </el-card>
+
+    <!-- 添加角色对话框 -->
+    <el-dialog title="提示" :visible.sync="addRoleDialogVisible" width="50%" @close="addRoleDialogClosed">
+      <!-- 内容输入区 -->
+      <el-form ref="addForm" :model="addFormRole" :rules="addFormRules" label-width="70px">
+        <el-form-item label="角色名" prop="roleName">
+          <el-input v-model="addFormRole.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" prop="roleDesc">
+          <el-input v-model="addFormRole.roleDesc"></el-input>
+        </el-form-item>
+      </el-form>
+      <!-- 底部按钮区 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addRoleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addRoleDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -35,7 +86,10 @@ export default {
   data() {
     return {
       // 存储角色
-      roleslist: []
+      roleslist: [],
+      addRoleDialogVisible: false,
+      addFormRole: [],
+      addFormRules: {}
     }
   },
   methods: {
@@ -44,9 +98,47 @@ export default {
       const { data: res } = await this.$http.get('roles')
       if (res.meta.status !== 200) return this.$message.error('获取角色列表失败')
       this.roleslist = res.data
+    },
+    // 添加角色
+    addRole() {
+      this.addDialogVisible = true
+    },
+    // 监听添加角色对话框关闭
+    addRoleDialogClosed() {
+      this.$refs.addForm.resetFields()
+    },
+    // 删除指定角色权限
+    async removeRoleRight(role, id) {
+      // 提示框
+      const confirmRight = await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch((err) => err)
+      if (confirmRight !== 'confirm') return this.$message.info('取消删除')
+      // 发请求
+      const { data: res } = await this.$http.delete(`roles/${role.id}/rights/${id}`)
+      if (res.meta.status !== 200) return this.$message.error('删除权限失败')
+      // this.getRoleslist()
+      // 这里的 role 是引用 所用赋值会影响到外面
+      role.children = res.data
     }
   }
 }
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.el-tag {
+  margin: 7px;
+}
+.tag_top {
+  border-top: 1px solid #eee;
+}
+.tag_bottom {
+  border-bottom: 1px solid #eee;
+}
+.vcenter {
+  display: flex;
+  align-items: center;
+}
+</style>

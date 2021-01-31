@@ -4,6 +4,8 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
+  /* 保证页面最小宽度 不发生盒子下落 */
+  min-width: 1366px;
 }
 
 .el-card {
