@@ -15,7 +15,7 @@
             <el-tag v-if="scope.row.level === '1'">等级一</el-tag>
             <el-tag v-else-if="scope.row.level === '2'" type="success">等级二</el-tag>
             <!-- TODO: v-else 后面不用再跟参数了 -->
-            <el-tag v-else type="warning"> 等级三</el-tag>
+            <el-tag v-else type="warning">等级三</el-tag>
           </template>
         </el-table-column>
       </el-table>
