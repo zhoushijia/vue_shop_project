@@ -50,7 +50,7 @@
           <template slot-scope="">
             <el-button size="mini" type="primary" icon="el-icon-edit">编辑</el-button>
             <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
-            <el-button size="mini" type="warning" icon="el-icon-setting">分配权限</el-button>
+            <el-button size="mini" type="warning" icon="el-icon-setting" @click="setRight">分配权限</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -73,6 +73,17 @@
         <el-button type="primary" @click="addRoleDialogVisible = false">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 分配权限对话框 -->
+    <el-dialog title="分配权限" :visible.sync="setRightDialogVisible" width="50%">
+      <!-- 树形控件 -->
+      <!-- data 渲染后端数据  props 绑定子树节点和展示内容  show-checkbox 显示复选框 node-key 绑定对应id default-expand-all 默认展开 -->
+      <el-tree :data="rightlist" :props="treeProps" show-checkbox node-key="id" default-expand-all></el-tree>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRightDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="setRightDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -87,9 +98,17 @@ export default {
     return {
       // 存储角色
       roleslist: [],
+      // 添加角色
       addRoleDialogVisible: false,
       addFormRole: [],
-      addFormRules: {}
+      addFormRules: {},
+      // 分配权限
+      setRightDialogVisible: false,
+      rightlist: [],
+      treeProps: {
+        children: 'children',
+        label: 'authName'
+      }
     }
   },
   methods: {
@@ -109,7 +128,7 @@ export default {
     },
     // 删除指定角色权限
     async removeRoleRight(role, id) {
-      // 提示框
+      // 删除提示框
       const confirmRight = await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -122,6 +141,13 @@ export default {
       // this.getRoleslist()
       // 这里的 role 是引用 所用赋值会影响到外面
       role.children = res.data
+    },
+    // 分配权限
+    async setRight() {
+      const { data: res } = await this.$http.get('rights/tree')
+      if (res.meta.status !== 200) return this.$message.error('获取权限数据失败')
+      this.rightlist = res.data
+      this.setRightDialogVisible = true
     }
   }
 }
