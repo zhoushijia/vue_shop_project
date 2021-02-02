@@ -8,7 +8,7 @@
     </el-breadcrumb>
     <!-- 卡片区 -->
     <el-card>
-      <el-alert title="注意：只允许第三级分类设置相关参数" type="warning" effect="dark" :closable="false"> </el-alert>
+      <el-alert title="注意：只允许第三级分类设置相关参数" type="warning" :closable="false"> </el-alert>
       <el-row>
         <el-col>
           <span>请选择商品分类: </span>
@@ -21,6 +21,15 @@
           <el-button type="primary" :disabled="isBtnDisables" @click="showAddDialog">添加参数</el-button>
           <!-- 动态参数表格 -->
           <el-table :data="manyparams" style="width: 100%" border stripe>
+            <!-- 展开行 -->
+            <el-table-column type="expand">
+              <template slot-scope="scope">
+                <el-tag v-for="(item, index) in scope.row.attr_vals" :key="index" closable :disable-transitions="false" @close="tagClosed(scope.row, index)">{{ item }} </el-tag>
+                <!-- 标签 -->
+                <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)" @blur="handleInputConfirm(scope.row)"> </el-input>
+                <el-button v-else size="small" @click="showInput(scope.row)">+ New Tag</el-button>
+              </template>
+            </el-table-column>
             <el-table-column type="index" label="#"> </el-table-column>
             <el-table-column prop="attr_name" label="参数名称"> </el-table-column>
             <el-table-column label="操作">
@@ -35,6 +44,15 @@
           <el-button type="primary" :disabled="isBtnDisables" @click="showAddDialog">添加属性</el-button>
           <!-- 静态属性表格 -->
           <el-table :data="onlyparams" style="width: 100%" border stripe>
+            <!-- 展开行 -->
+            <el-table-column type="expand">
+              <template slot-scope="scope">
+                <el-tag v-for="(item, index) in scope.row.attr_vals" :key="index" closable :disable-transitions="false" @close="tagClosed(scope.row, index)">{{ item }} </el-tag>
+                <!-- 标签 -->
+                <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)" @blur="handleInputConfirm(scope.row)"> </el-input>
+                <el-button v-else size="small" @click="showInput(scope.row)">+ New Tag</el-button>
+              </template>
+            </el-table-column>
             <el-table-column type="index" label="#"> </el-table-column>
             <el-table-column prop="attr_name" label="参数名称"> </el-table-column>
             <el-table-column label="操作">
@@ -148,11 +166,24 @@ export default {
     // 获取动态参数或静态属性
     async getParamsData() {
       // TODO: 注意这里需要清空 selectedKeys
-      if (this.selectedKeys.length !== 3) return (this.selectedKeys = [])
-      // console.log(this.cateId)
+      if (this.selectedKeys.length !== 3) {
+        this.selectedKeys = []
+        // #7 当选中的不是3级子分类时 清空表格数据
+        this.manyparams = []
+        this.onlyparams = []
+        return
+      }
       const { data: res } = await this.$http.get(`categories/${this.cateId}/attributes`, { params: { sel: this.activeName } })
-      //   console.log(res)
       if (res.meta.status !== 200) return this.$message.error('根据id获取分类参数失败')
+
+      res.data.forEach((item) => {
+        // 将字符串转化成数组
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
+        // 新增标签内容,input框是否隐藏
+        item.inputVisible = false
+        // 新增标签内容,input框中的值
+        item.inputValue = ''
+      })
       if (this.activeName === 'many') return (this.manyparams = res.data)
       this.onlyparams = res.data
     },
@@ -208,6 +239,56 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('删除参数失败')
       this.$message.success('删除参数成功')
       this.getParamsData()
+    },
+    // #5 新增标签内容
+    showInput(row) {
+      // 点击新增按钮 显示input框
+      row.inputVisible = true
+      // 数据更新到视图渲染是异步的 $nextTick可以保证代码在渲染完成后再执行 在渲染完成后自动聚焦
+      this.$nextTick(() => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
+    },
+    handleInputConfirm(row) {
+      // 如果输入内容为空字符
+      if (row.inputValue.trim().length <= 0) {
+        row.inputValue = ''
+        row.inputVisible = false
+        return
+      }
+      //   let r = JSON.parse(JSON.stringify(row.attr_vals)).push(row.inputValue.trim())
+      // 这里前端已经将标签添加成功，但数据还未传到后端
+      row.attr_vals.push(row.inputValue.trim())
+      this.saveTagChange(row)
+      // 发请求
+      /*  const { data: res } = await this.$http.put(`categories/${row.cat_id}/attributes/${row.attr_id}`, {
+        attr_name: row.attr_name,
+        attr_sel: row.attr_sel,
+        // 这里必须传字符串
+        attr_vals: row.attr_vals.join(' ')
+        // attr_vals: r.join(' ')
+      })
+      if (res.meta.status !== 200) return this.$message.error('添加标签失败')
+      this.$message.success('添加标签成功') */
+      // row.attr_vals = r
+      row.inputValue = ''
+      row.inputVisible = false
+    },
+    // #6 删除标签
+    tagClosed(row, i) {
+      row.attr_vals.splice(i, 1)
+      this.saveTagChange(row)
+    },
+    async saveTagChange(row) {
+      // 发请求
+      const { data: res } = await this.$http.put(`categories/${row.cat_id}/attributes/${row.attr_id}`, {
+        attr_name: row.attr_name,
+        attr_sel: row.attr_sel,
+        // 这里必须传字符串
+        attr_vals: row.attr_vals.join(' ')
+      })
+      if (res.meta.status !== 200) return this.$message.error('添加标签失败')
+      this.$message.success('添加标签成功')
     }
   },
   computed: {
@@ -230,5 +311,11 @@ export default {
 <style lang="less" scoped>
 .el-alert {
   margin-bottom: 15px;
+}
+.el-tag {
+  margin: 10px;
+}
+.input-new-tag {
+  width: 150px;
 }
 </style>
