@@ -18,28 +18,28 @@
       <!-- tab切换 -->
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="动态参数" name="many">
-          <el-button type="primary" :disabled="isBtnDisables">添加参数</el-button>
+          <el-button type="primary" :disabled="isBtnDisables" @click="showAddDialog">添加参数</el-button>
           <!-- 动态参数表格 -->
           <el-table :data="manyparams" style="width: 100%" border stripe>
             <el-table-column type="index" label="#"> </el-table-column>
             <el-table-column prop="attr_name" label="参数名称"> </el-table-column>
             <el-table-column label="操作">
-              <template slot-scope="">
-                <el-button size="mini" type="primary" icon="el-icon-edit">编辑</el-button>
+              <template slot-scope="scope">
+                <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.id)">编辑</el-button>
                 <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="静态属性" name="only">
-          <el-button type="primary" :disabled="isBtnDisables">添加属性</el-button>
+          <el-button type="primary" :disabled="isBtnDisables" @click="showAddDialog">添加属性</el-button>
           <!-- 静态属性表格 -->
           <el-table :data="onlyparams" style="width: 100%" border stripe>
             <el-table-column type="index" label="#"> </el-table-column>
             <el-table-column prop="attr_name" label="参数名称"> </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="">
-                <el-button size="mini" type="primary" icon="el-icon-edit">编辑</el-button>
+                <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.id)">编辑</el-button>
                 <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
               </template>
             </el-table-column>
@@ -47,6 +47,32 @@
         </el-tab-pane>
       </el-tabs>
     </el-card>
+
+    <!-- 增加参数对话框 -->
+    <el-dialog :title="'添加' + isTitle" :visible.sync="addDialogVisible" width="50%" @close="addDialogClosed">
+      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="80px">
+        <el-form-item :label="isTitle" prop="attr_name">
+          <el-input v-model="addForm.attr_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addParams">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 编辑参数对话框 -->
+    <el-dialog :title="'添加' + isTitle" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
+      <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="80px">
+        <el-form-item :label="isTitle" prop="attr_name">
+          <el-input v-model="editForm.attr_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editParams">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -55,8 +81,9 @@ export default {
   name: 'Cateparams',
   data() {
     return {
-      // ##1 获取商品分类
+      // ##0 获取商品分类
       catelist: [],
+      // ##1 获取参数
       selectedKeys: [],
       cascaderProps: {
         // 当用户选择时传给v-model的值
@@ -68,9 +95,27 @@ export default {
         // 鼠标经过则显示子项
         expandTrigger: 'hover'
       },
+      // tab栏切换属性
       activeName: 'many',
+      // 获取动态参数
       manyparams: [],
-      onlyparams: []
+      // 静态属性
+      onlyparams: [],
+      // ##2 增加参数
+      addDialogVisible: false,
+      addForm: {
+        attr_name: ''
+      },
+      addFormRules: {
+        attr_name: [
+          { required: true, message: '请输入参数名称', trigger: 'blur' },
+          { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
+        ]
+      },
+      // ##3 编辑参数
+      editDialogVisible: false,
+      editForm: {},
+      editFormRules: {}
     }
   },
   created() {
@@ -103,9 +148,29 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('根据id获取分类参数失败')
       if (this.activeName === 'many') return (this.manyparams = res.data)
       this.onlyparams = res.data
-    }
+    },
+    // #2 添加动态参数或静态属性
+    showAddDialog() {
+      this.addDialogVisible = true
+    },
+    addDialogClosed() {
+      this.$refs.addFormRef.resetFields()
+    },
+    addParams() {
+      this.$refs.addFormRef.validate(async (valid) => {
+        if (!valid) return
+        const { data: res } = await this.$http.post(`categories/${this.cateId}/attributes`, { ...this.addForm, attr_sel: this.activeName })
+        if (res.meta.status !== 201) return this.$message.error('添加参数失败')
+        this.$message.success('添加参数成功')
+        this.getParamsData()
+        this.addDialogVisible = false
+      })
+    },
+    // #3 编辑动态参数或静态属性
+    editParams() {}
   },
   computed: {
+    // ##1 获取动态参数或静态属性
     // 当级联栏选中了3级 则按钮可用
     isBtnDisables() {
       return this.selectedKeys.length !== 3 ? true : false
@@ -113,6 +178,10 @@ export default {
     // TODO: 获取级联列表中选中的id
     cateId() {
       return this.selectedKeys.length === 3 ? this.selectedKeys[2] : null
+    },
+    // ##2 增加参数
+    isTitle() {
+      return this.activeName === 'many' ? '动态参数' : '静态属性'
     }
   }
 }
