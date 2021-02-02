@@ -39,8 +39,8 @@
     </el-card>
 
     <!-- 添加分类对话框 -->
-    <el-dialog title="添加分类" :visible.sync="addCateDialogVisible" width="50%">
-      <el-form ref="addCateFormRef" :model="addCateForm" :rules="addCateFormRules" label-width="70px">
+    <el-dialog title="添加分类" :visible.sync="addCateDialogVisible" width="50%" @close="addCateDialogClosed">
+      <el-form ref="addCateFormRef" :model="addCateForm" :rules="addCateFormRules" label-width="80px">
         <el-form-item label="分类名称" prop="cat_name">
           <el-input v-model="addCateForm.cat_name"></el-input>
         </el-form-item>
@@ -48,12 +48,12 @@
           <!-- options: 指定数据源 -->
           <!-- props: 用来指定配置对象 -->
           <!-- checkStrictly 允许选择一级分类 -->
-          <el-cascader v-model="selectedKeys" :options="parentCateList" :props="cascaderProps" @change="parentCateChanged" style="width:100%;"></el-cascader>
+          <el-cascader v-model="selectedKeys" :options="parentCateList" :props="cascaderProps" clearable @change="parentCateChanged" style="width:100%;"></el-cascader>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addCateDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addCateDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="addCate">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -108,7 +108,12 @@ export default {
         cat_name: '',
         cat_level: 0
       },
-      addCateFormRules: {},
+      addCateFormRules: {
+        cat_name: [
+          { required: true, message: '请输入商品分类名称', trigger: 'blur' },
+          { min: 1, max: 10, message: '角色名长度在 1 到 10 个字符', trigger: 'blur' }
+        ]
+      },
       // 级联选择器配置
       cascaderProps: {
         // 当用户选择时传给v-model的值
@@ -122,14 +127,14 @@ export default {
         // 鼠标经过则显示子项
         expandTrigger: 'hover'
       },
-      // 被选中的级联的id数组
-      selectedKeys: [],
       // 存储父级商品分类列表
-      parentCateList: []
+      parentCateList: [],
+      // 被选中的级联的id数组
+      selectedKeys: []
     }
   },
   methods: {
-    //   查询商品分类列表
+    // #1 查询商品分类列表
     async getCategories() {
       const { data: res } = await this.$http.get('categories', { params: this.queryCate })
       // console.log(res)
@@ -147,6 +152,7 @@ export default {
       this.queryCate.pagenum = newPage
       this.getCategories()
     },
+    // #2 添加商品分类
     // 添加分类对话框显示
     async showAddCateDialog() {
       // 先发请求获取商品分类列表
@@ -157,9 +163,36 @@ export default {
       // 跳出弹框
       this.addCateDialogVisible = true
     },
-    // 级联选择器改变
+    // 级联选择器改变 收集数据
     parentCateChanged() {
-      // this.selectedKeys =
+      if (this.selectedKeys.length > 0) {
+        // console.log(this.selectedKeys)
+        // 被选中的级联的id数组的最后一项则是父级id
+        this.addCateForm.cat_pid = this.selectedKeys[this.selectedKeys.length - 1]
+        // 被选中的级联的id数组的长度则是该商品分类的等级
+        this.addCateForm.cat_level = this.selectedKeys.length
+      } else {
+        this.addCateForm.cat_pid = 0
+        this.addCateForm.cat_level = 0
+      }
+    },
+    // 关闭对话框时
+    addCateDialogClosed() {
+      this.$refs.addCateFormRef.resetFields()
+      this.addCateForm.cat_pid = 0
+      this.addCateForm.cat_level = 0
+      this.selectedKeys = []
+    },
+    // 确定时 发请求添加商品分类数据
+    addCate() {
+      this.$refs.addCateFormRef.validate(async (valid) => {
+        if (!valid) return
+        const { data: res } = await this.$http.post('categories', this.addCateForm)
+        if (res.meta.status !== 201) return this.$message.error('添加商品分类失败')
+        this.$message.success('添加商品分类成功')
+        this.getCategories()
+        this.addCateDialogVisible = false
+      })
     }
   }
 }
