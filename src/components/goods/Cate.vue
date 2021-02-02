@@ -264,7 +264,6 @@ export default {
       // 发请求
       const { data: res } = await this.$http.delete(`categories/${cate.cat_id}`)
       if (res.meta.status !== 200) return this.$message.error('删除分类失败')
-      console.log(cate)
       this.$message.success('删除分类成功')
       // 被删除项的父id是0 并且 长度为1 则说明是最外层的
       if (this.catelist.length === 1 && cate.cat_pid === 0) {
