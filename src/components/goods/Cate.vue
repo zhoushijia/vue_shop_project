@@ -14,7 +14,8 @@
         </el-col>
       </el-row>
       <!-- vue-table-with-tree-grid -->
-      <zk-table :data="catelist" :columns="columns" :expand-type="false" :selection-type="false" show-index index-text="" border show-row-hover>
+      <!-- data数据绑定 columns表格列设置 expand-type展开行 selection-type复选框 show-index每行索引 show-row-hover经过时高亮 -->
+      <zk-table :data="catelist" :columns="columns" :expand-type="false" :selection-type="false" show-index index-text="#" border :show-row-hover="false">
         <!-- 是否有效 -->
         <template slot="isOk" scope="scope">
           <i class="el-icon-success" v-if="scope.row.cat_deleted === false" style="color:lightgreen;"></i>
@@ -47,7 +48,7 @@
           <!-- options: 指定数据源 -->
           <!-- props: 用来指定配置对象 -->
           <!-- checkStrictly 允许选择一级分类 -->
-          <el-cascader v-model="selectedKeys" :options="parentCateList" :props="cascaderProps" @change="parentCateChanged"></el-cascader>
+          <el-cascader v-model="selectedKeys" :options="parentCateList" :props="cascaderProps" @change="parentCateChanged" style="width:100%;"></el-cascader>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -65,7 +66,8 @@ export default {
   },
   data() {
     return {
-      // 查询条件
+      // ##1 查询商品列表
+      //  查询条件
       queryCate: {
         type: 3,
         pagenum: 1,
@@ -98,6 +100,7 @@ export default {
           template: 'operate'
         }
       ],
+      // ##2 添加分类
       // 添加分类
       addCateDialogVisible: false,
       addCateForm: {
