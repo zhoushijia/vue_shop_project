@@ -25,8 +25,8 @@
             <el-table-column prop="attr_name" label="参数名称"> </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.id)">编辑</el-button>
-                <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
+                <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.attr_id)">编辑</el-button>
+                <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteParams(scope.row.attr_id)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -38,9 +38,9 @@
             <el-table-column type="index" label="#"> </el-table-column>
             <el-table-column prop="attr_name" label="参数名称"> </el-table-column>
             <el-table-column label="操作">
-              <template slot-scope="">
-                <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.id)">编辑</el-button>
-                <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
+              <template slot-scope="scope">
+                <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.attr_id)">编辑</el-button>
+                <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteParams(scope.row.attr_id)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -114,8 +114,15 @@ export default {
       },
       // ##3 编辑参数
       editDialogVisible: false,
-      editForm: {},
-      editFormRules: {}
+      editForm: {
+        attr_name: ''
+      },
+      editFormRules: {
+        attr_name: [
+          { required: true, message: '请输入参数名称', trigger: 'blur' },
+          { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
+        ]
+      }
     }
   },
   created() {
@@ -167,7 +174,41 @@ export default {
       })
     },
     // #3 编辑动态参数或静态属性
-    editParams() {}
+    async showEditDialog(id) {
+      console.log(id)
+      const { data: res } = await this.$http.get(`categories/${this.cateId}/attributes/${id}`, { params: { attr_sel: this.activeName } })
+      console.log(res)
+      if (res.meta.status !== 200) return this.$message.error('根据id获取分类参数失败')
+      this.editForm = res.data
+      this.editDialogVisible = true
+    },
+    editDialogClosed() {
+      this.$refs.editFormRef.resetFields()
+    },
+    editParams() {
+      this.$refs.editFormRef.validate(async (valid) => {
+        if (!valid) return
+        const { data: res } = await this.$http.put(`categories/${this.editForm.cat_id}/attributes/${this.editForm.attr_id}`, this.editForm)
+        if (res.meta.status !== 200) return this.$message.error('更新参数失败')
+        this.$message.success('更新参数成功')
+        this.getParamsData()
+        this.editDialogVisible = false
+      })
+    },
+    // #4 删除参数
+    async deleteParams(id) {
+      const confirmResult = await this.$confirm('此操作将永久删除该参数, 是否继续?', '删除参数', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch((err) => err)
+      if (confirmResult !== 'confirm') return this.$message.info('已取消删除参数')
+      // 发请求删除用户
+      const { data: res } = await this.$http.delete(`categories/${this.cateId}/attributes/${id}`)
+      if (res.meta.status !== 200) return this.$message.error('删除参数失败')
+      this.$message.success('删除参数成功')
+      this.getParamsData()
+    }
   },
   computed: {
     // ##1 获取动态参数或静态属性
