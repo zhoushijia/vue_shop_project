@@ -33,11 +33,11 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" width="120px">
-          <template slot-scope="">
+          <template slot-scope="scope">
             <!-- 修改按钮  -->
             <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
             <!-- 删除按钮  -->
-            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeGood(scope.row.goods_id)"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -73,6 +73,34 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('获取商品列表失败')
       this.goodslist = res.data.goods
       this.total = res.data.total
+    },
+    // 页条数值改变 监听新值
+    handleSizeChange(newSize) {
+      this.queryGood.pagesize = newSize
+      this.getGoodslist()
+    },
+    // 页码改变
+    handleCurrentChange(newPagenum) {
+      this.queryGood.pagenum = newPagenum
+      this.getGoodslist()
+    },
+    // #4 删除商品
+    async removeGood(id) {
+      const confirmResult = await this.$confirm('此操作将永久删除该商品, 是否继续?', '删除商品', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch((err) => err)
+      if (confirmResult !== 'confirm') return this.$message.info('已取消删除商品')
+      // 发请求删除商品
+      const { data: res } = await this.$http.delete('goods/' + id)
+      if (res.meta.status !== 200) return this.$message.error('删除商品失败')
+      // 解决分页删除时小 bug
+      if (this.goodslist.length == 1) {
+        this.queryGood.pagenum = this.queryGood.pagenum > 1 ? this.queryGood.pagenum - 1 : 1
+      }
+      this.$message.success('删除商品成功')
+      this.getGoodslist()
     }
   }
 }
