@@ -10,6 +10,7 @@ import hub from '../utils/hub.js'
 import Cate from '../components/goods/Cate.vue'
 import Cateparams from '../components/goods/Cateparams.vue'
 import Goodslist from '../components/goods/Goodslist.vue'
+import Addgood from '../components/goods/Addgood.vue'
 
 // 注册路由分支
 Vue.use(VueRouter)
@@ -28,7 +29,8 @@ const routes = [
       { path: '/roles', component: Roles },
       { path: '/categories', component: Cate },
       { path: '/params', component: Cateparams },
-      { path: '/goods', component: Goodslist }
+      { path: '/goods', component: Goodslist },
+      { path: '/goods/add', component: Addgood }
     ]
   }
 ]

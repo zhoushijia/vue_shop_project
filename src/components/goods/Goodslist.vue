@@ -17,7 +17,7 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary">添加商品</el-button>
+          <el-button type="primary" @click="addGood">添加商品</el-button>
         </el-col>
       </el-row>
 
@@ -83,6 +83,10 @@ export default {
     handleCurrentChange(newPagenum) {
       this.queryGood.pagenum = newPagenum
       this.getGoodslist()
+    },
+    // #2 添加商品
+    addGood() {
+      this.$router.push('/goods/add')
     },
     // #4 删除商品
     async removeGood(id) {

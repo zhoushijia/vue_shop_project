@@ -28,3 +28,11 @@ body,
 .el-scrollbar__wrap {
   overflow-x: hidden;
 }
+
+/* 步骤条 */
+.el-steps {
+  margin: 15px;
+}
+.el-step__title {
+  font-size: 12px;
+}
