@@ -42,7 +42,7 @@
               <!-- 修改按钮  -->
               <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row.id)"></el-button>
               <!-- 删除按钮  -->
-              <el-button type="warning" icon="el-icon-delete" size="mini" @click="deleteUser(scope.row.id)"></el-button>
+              <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(scope.row.id)"></el-button>
               <!-- 分配按钮 需要提示文本 tooltip -->
               <el-tooltip effect="dark" content="分配角色" :enterable="false" placement="top">
                 <el-button type="danger" icon="el-icon-setting" size="mini" @click="setRole(scope.row)"></el-button>
