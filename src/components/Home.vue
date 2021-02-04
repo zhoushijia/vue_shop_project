@@ -14,7 +14,7 @@
         <div class="toggle-button" @click="toggleCollapse">|||</div>
         <!-- 主菜单 -->
         <!-- 1. active-text-color 选中高亮颜色 2. submenu是否只保持一个子菜单的展开unique-opened 3. collapse-transition 必须动态绑定 4. collapse 折叠 5. router 路由链接激活 6. default-active当前激活菜单的 index -->
-        <el-menu background-color="#333744" text-color="#fff" active-text-color="skyblue" unique-opened :collapse-transition="false" :collapse="isCollapse" router :default-active="activePath">
+        <el-menu background-color="#333744" text-color="#fff" active-text-color="#409eff" unique-opened :collapse-transition="false" :collapse="isCollapse" router :default-active="activePath">
           <!-- 一级菜单 -->
           <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id">
             <template slot="title">

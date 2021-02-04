@@ -295,7 +295,7 @@ export default {
     // ##1 获取动态参数或静态属性
     // 当级联栏选中了3级 则按钮可用
     isBtnDisables() {
-      return this.selectedKeys.length !== 3 ? true : false
+      return this.selectedKeys.length !== 3
     },
     // TODO: 获取级联列表中选中的id
     cateId() {
