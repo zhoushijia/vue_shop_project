@@ -41,7 +41,7 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button size="mini" type="primary" icon="el-icon-edit" @click="showAddressDialog(scope.row)"></el-button>
-            <el-button size="mini" type="success" icon="el-icon-location"></el-button>
+            <el-button size="mini" type="success" icon="el-icon-location" @click="showPckageDialog(scope.row)"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -61,6 +61,14 @@
           <el-button @click="addressDialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="addressDialogVisible = false">确 定</el-button>
         </span>
+      </el-dialog>
+
+      <el-dialog title="快递信息" :visible.sync="packageDialogVisible" width="50%">
+        <el-timeline>
+          <el-timeline-item v-for="(activity, index) in packageInfo" :key="index" :timestamp="activity.time">
+            {{ activity.context }}
+          </el-timeline-item>
+        </el-timeline>
       </el-dialog>
     </el-card>
   </div>
@@ -88,7 +96,10 @@ export default {
         address2: [{ required: true, message: '请输入详细地址', trigger: 'blur' }]
       },
       city,
-      cityProps: { expandTrigger: 'hover', value: 'children', label: 'label', children: 'children' }
+      cityProps: { expandTrigger: 'hover', value: 'children', label: 'label', children: 'children' },
+      // #3 物流信息
+      packageDialogVisible: false,
+      packageInfo: []
     }
   },
   created() {
@@ -117,7 +128,13 @@ export default {
     addressDialogClosed() {
       this.$refs.addressFormRef.resetFields()
     },
-    handleChange() {}
+    handleChange() {},
+    async showPckageDialog() {
+      const { data: res } = await this.$http.get('/kuaidi/804909574412544580')
+      if (res.meta.status !== 200) return this.$message.error('获取物流信息失败')
+      this.packageInfo = res.data
+      this.packageDialogVisible = true
+    }
   }
 }
 </script>
