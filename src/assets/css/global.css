@@ -36,3 +36,10 @@ body,
 .el-step__title {
   font-size: 12px;
 }
+
+.ql-editor {
+  height: 300px !important;
+}
+.quill-editor {
+  margin-bottom: 15px;
+}

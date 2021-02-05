@@ -28,7 +28,7 @@
             <el-form-item label="数量" prop="goods_number"> <el-input v-model="addForm.goods_number"></el-input> </el-form-item>
             <el-form-item label="重量" prop="goods_weight"> <el-input v-model="addForm.goods_weight"></el-input> </el-form-item>
             <el-form-item label="商品分类" prop="goods_cat">
-              <el-cascader v-model="addForm.goods_cat" :options="catelist" :props="cateProps" @change="handleChange"></el-cascader>
+              <el-cascader v-model="addForm.goods_cat" :options="catelist" :props="cateProps" @change="handleChange" style="width:100%;"></el-cascader>
             </el-form-item>
           </el-tab-pane>
           <!-- 动态参数 -->
@@ -50,28 +50,47 @@
           <!-- 上传图片 -->
           <el-tab-pane label="商品图片" name="3">
             <!-- on-preview 点击文件列表中已上传的文件时的钩子 on-remove 文件列表移除文件时的钩子 list-type 文件列表的类型-->
-            <el-upload :action="uploadImgURL" :on-preview="handlePreview" :on-remove="handleRemove" list-type="picture" :headers="reqHeader">
+            <el-upload :action="uploadImgURL" :on-preview="handlePreview" :on-remove="handleRemove" :on-success="handleSuccess" list-type="picture" :headers="reqHeader">
               <el-button size="small" type="primary">点击上传</el-button>
             </el-upload>
           </el-tab-pane>
-          <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
+          <el-tab-pane label="商品内容" name="4">
+            <!-- 富文本编辑器 -->
+            <quill-editor v-model="addForm.goods_introduce"></quill-editor>
+            <!-- 添加商品按钮 -->
+            <el-button type="primary" @click="addCate">添加商品</el-button>
+          </el-tab-pane>
         </el-tabs>
       </el-form>
     </el-card>
+
+    <el-dialog title="预览图片" :visible.sync="priviewImgDialogVisible" width="50%">
+      <el-image :src="previewPath" style="width:100%"></el-image>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="priviewImgDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="priviewImgDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
+import _ from 'lodash'
 export default {
   name: 'Addgood',
   data() {
     return {
+      // ##1
       activeStep: 0,
+      // ##2
       addForm: {
         goods_name: '',
-        goods_price: '',
-        goods_number: '',
-        goods_weight: '',
-        goods_cat: []
+        goods_price: '0',
+        goods_number: '0',
+        goods_weight: '0',
+        goods_cat: [],
+        pics: [],
+        goods_introduce: '',
+        attrs: []
       },
       addFormRules: {
         goods_name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
@@ -95,14 +114,16 @@ export default {
       // 图片URL
       uploadImgURL: 'http://127.0.0.1:8888/api/private/v1/upload',
       // 请求头
-      reqHeader: { authorization: window.sessionStorage.getItem('token') }
+      reqHeader: { authorization: window.sessionStorage.getItem('token') },
+      previewPath: '',
+      priviewImgDialogVisible: false
     }
   },
   created() {
     this.getCatelist()
   },
   methods: {
-    //   获取商品分类
+    // #1  获取商品分类
     async getCatelist() {
       const { data: res } = await this.$http.get('categories')
       if (res.meta.status !== 200) return this.$message.error('获取商品分类失败')
@@ -130,19 +151,61 @@ export default {
         res.data.forEach((item) => {
           item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
         })
-        console.log(res.data)
         this.manyParams = res.data
       } else if (this.activeStep == 2) {
         const { data: res } = await this.$http.get(`categories/${this.cateId}/attributes`, { params: { sel: 'only' } })
         if (res.meta.status !== 200) this.$message.error('获取静态属性失败')
-        console.log(res.data)
         this.onlyParams = res.data
       }
     },
     // 图片预处理
-    handlePreview() {},
-    // 图片移除
-    handleRemove() {}
+    handlePreview(file) {
+      // 获取图片信息
+      console.log(file)
+      this.previewPath = file.response.data.url
+      this.priviewImgDialogVisible = true
+    },
+    // 图片移除 主要是为了移除pics中的图片信息
+    handleRemove(file) {
+      // file是要删除的文件
+      const removeIndex = this.addForm.pics.findIndex((item) => {
+        file.response.data.tmp_path === item.pic
+      })
+      this.addForm.pics.splice(removeIndex, 1)
+    },
+    // 图片上传成功后 获取临时信息存储到form种
+    handleSuccess(response) {
+      // response是上传成功的返回对象
+      this.addForm.pics.push({ pic: response.data.tmp_path })
+    },
+    // 添加商品
+    addCate() {
+      this.$refs.addFormRef.validate(async (valid) => {
+        if (!valid) return
+        // 需要传入动态属性和静态参数
+        this.manyParams.forEach((item) => {
+          const newInfo = {
+            attr_id: item.attr_id,
+            attr_value: item.attr_vals.join(' ')
+          }
+          this.addForm.attrs.push(newInfo)
+        })
+        this.onlyParams.forEach((item) => {
+          const newInfo = {
+            attr_id: item.attr_id,
+            attr_value: item.attr_vals
+          }
+          this.addForm.attrs.push(newInfo)
+        })
+        // 克隆的目的是不该表addForm.goods_cat的数据类型，保证数据绑定的级联组件不出错
+        const form = _.cloneDeep(this.addForm)
+        form.goods_cat = form.goods_cat.join(',')
+        const { data: res } = await this.$http.post('goods', form)
+        if (res.meta.status !== 201) return this.$message.error('添加商品失败')
+        this.$message.success('添加商品成功')
+        this.$router.push('/goods')
+      })
+    }
   },
   computed: {
     cateId() {

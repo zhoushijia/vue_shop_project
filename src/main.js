@@ -12,6 +12,13 @@ import axios from 'axios'
 // 导入 vue-table-with-tree-grid
 import ZkTable from 'vue-table-with-tree-grid'
 Vue.component('zk-table', ZkTable)
+// 导入富文本 插件
+import quillEditor from 'vue-quill-editor' //调用编辑器
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
+Vue.use(quillEditor)
 
 Vue.filter('dateFormat', function(originVal) {
   const dt = new Date(originVal)

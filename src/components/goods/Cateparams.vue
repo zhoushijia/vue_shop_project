@@ -80,7 +80,7 @@
     </el-dialog>
 
     <!-- 编辑参数对话框 -->
-    <el-dialog :title="'添加' + isTitle" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
+    <el-dialog :title="'编辑' + isTitle" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
       <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="80px">
         <el-form-item :label="isTitle" prop="attr_name">
           <el-input v-model="editForm.attr_name"></el-input>
