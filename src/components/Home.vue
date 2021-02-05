@@ -3,7 +3,7 @@
     <!-- 头部 -->
     <el-header class="home_header">
       <div>
-        <img src="../assets/top.png" alt="" />
+        <img src="../assets/cry.png" alt="" width="100px" />
         <span>Tom电商后台管理系统</span>
       </div>
       <el-button type="info" @click="loginOut">退出</el-button>
