@@ -12,6 +12,7 @@ import Cateparams from '../components/goods/Cateparams.vue'
 import Goodslist from '../components/goods/Goodslist.vue'
 import Addgood from '../components/goods/Addgood.vue'
 import Orders from '../components/orders/Orders.vue'
+import Reports from '../components/reports/Reports.vue'
 
 // 注册路由分支
 Vue.use(VueRouter)
@@ -32,7 +33,8 @@ const routes = [
       { path: '/params', component: Cateparams },
       { path: '/goods', component: Goodslist },
       { path: '/goods/add', component: Addgood },
-      { path: '/orders', component: Orders }
+      { path: '/orders', component: Orders },
+      { path: '/reports', component: Reports }
     ]
   }
 ]

@@ -129,6 +129,7 @@ export default {
       this.$refs.addressFormRef.resetFields()
     },
     handleChange() {},
+    // #3 物流信息
     async showPckageDialog() {
       const { data: res } = await this.$http.get('/kuaidi/804909574412544580')
       if (res.meta.status !== 200) return this.$message.error('获取物流信息失败')
