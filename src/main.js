@@ -17,6 +17,10 @@ import quillEditor from 'vue-quill-editor' //调用编辑器
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
+// 优化
+// #1 进度条
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
 Vue.use(quillEditor)
 
@@ -36,12 +40,16 @@ Vue.filter('dateFormat', function(originVal) {
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
 // 请求拦截器 添加令牌
 axios.interceptors.request.use((config) => {
+  // 请求前 进度条开始
+  NProgress.start()
   // 请求头添加 Authorization
   config.headers.authorization = window.sessionStorage.getItem('token')
   return config
 })
 // 响应拦截器 拦截无效token
 axios.interceptors.response.use((res) => {
+  // 请求完成时 进度条结束
+  NProgress.done()
   if (res.data.meta.msg === '无效token' && res.data.meta.status === 400) {
     window.sessionStorage.clear()
     // 原生的 hash 地址
