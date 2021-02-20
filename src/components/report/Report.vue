@@ -13,6 +13,7 @@
   </div>
 </template>
 <script>
+// ! 注意导入方式
 import * as echarts from 'echarts'
 import _ from 'lodash'
 export default {

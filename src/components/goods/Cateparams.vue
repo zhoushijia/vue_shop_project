@@ -25,7 +25,7 @@
             <el-table-column type="expand">
               <template slot-scope="scope">
                 <el-tag v-for="(item, index) in scope.row.attr_vals" :key="index" closable :disable-transitions="false" @close="tagClosed(scope.row, index)">{{ item }} </el-tag>
-                <!-- 标签 -->
+                <!-- 新增标签 -->
                 <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)" @blur="handleInputConfirm(scope.row)"> </el-input>
                 <el-button v-else size="small" @click="showInput(scope.row)">+ New Tag</el-button>
               </template>

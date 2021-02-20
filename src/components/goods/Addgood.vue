@@ -66,10 +66,6 @@
 
     <el-dialog title="预览图片" :visible.sync="priviewImgDialogVisible" width="50%">
       <el-image :src="previewPath" style="width:100%"></el-image>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="priviewImgDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="priviewImgDialogVisible = false">确 定</el-button>
-      </span>
     </el-dialog>
   </div>
 </template>
