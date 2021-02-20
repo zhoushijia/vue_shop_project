@@ -16,7 +16,7 @@ module.exports = {
         lodash: '_',
         echarts: 'echarts',
         nprogress: 'NProgress',
-        'vue-quill-editor': 'quillEditor'
+        'vue-quill-editor': 'VueQuillEditor'
       })
 
       // 在htmlWebpackPlugin上挂载属性

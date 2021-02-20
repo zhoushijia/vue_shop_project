@@ -56,7 +56,7 @@
           </el-tab-pane>
           <el-tab-pane label="商品内容" name="4">
             <!-- 富文本编辑器 -->
-            <quill-editor v-model="addForm.goods_introduce"></quill-editor>
+            <vue-quill-editor v-model="addForm.goods_introduce"></vue-quill-editor>
             <!-- 添加商品按钮 -->
             <el-button type="primary" @click="addCate">添加商品</el-button>
           </el-tab-pane>
