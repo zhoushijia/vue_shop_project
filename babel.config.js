@@ -1,4 +1,5 @@
 const babelPlugins = []
+// 优化#2 生产环境下移除console
 if (process.env.NODE_ENV === 'production') {
   babelPlugins.push('transform-remove-console')
 }

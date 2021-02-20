@@ -17,18 +17,18 @@
       <!-- data数据绑定 columns表格列设置 expand-type展开行 selection-type复选框 show-index每行索引 show-row-hover经过时高亮 -->
       <zk-table :data="catelist" :columns="columns" :expand-type="false" :selection-type="false" show-index index-text="#" border :show-row-hover="false">
         <!-- 是否有效 -->
-        <template slot="isOk" scope="scope">
+        <template slot="isOk" slot-scope="scope">
           <i class="el-icon-success" v-if="scope.row.cat_deleted === false" style="color:lightgreen;"></i>
           <i class="el-icon-error" v-else style="color:red;"></i>
         </template>
         <!-- 排序 -->
-        <template slot="order" scope="scope">
+        <template slot="order" slot-scope="scope">
           <el-tag v-if="scope.row.cat_level === 0">一级</el-tag>
           <el-tag type="success" v-else-if="scope.row.cat_level === 1">二级</el-tag>
           <el-tag type="warning" v-else>三级</el-tag>
         </template>
         <!-- 操作 -->
-        <template slot="operate" scope="scope">
+        <template slot="operate" slot-scope="scope">
           <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditCateDialog(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteCate(scope.row)">删除</el-button>
         </template>
