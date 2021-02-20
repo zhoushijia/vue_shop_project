@@ -126,11 +126,11 @@ export default {
       addFormRules: {
         roleName: [
           { required: true, message: '请输入角色名', trigger: 'blur' },
-          { min: 3, max: 10, message: '角色名长度在 3 到 10 个字符', trigger: 'blur' }
+          { min: 1, max: 10, message: '角色名长度在 3 到 10 个字符', trigger: 'blur' }
         ],
         roleDesc: [
           { required: true, message: '请输入角色描述', trigger: 'blur' },
-          { min: 3, max: 15, message: '角色描述长度在 3 到 15个字符', trigger: 'blur' }
+          { min: 1, max: 15, message: '角色描述长度在 3 到 15个字符', trigger: 'blur' }
         ]
       },
       // 编辑角色
@@ -248,7 +248,7 @@ export default {
     },
     // 获取三级子权限id
     getLeafKeys(role, arr) {
-      // 如果灭有children属性 说明是三级子角色
+      // 如果没有children属性 说明是三级子权限
       if (!role.children) return arr.push(role.id)
       // 继续往下找
       role.children.forEach((item) => {
@@ -261,6 +261,7 @@ export default {
     },
     // 分配权限
     async allotRight() {
+      // 获取选中的子权限id和半选中父权限id
       const keys = [...this.$refs.treeRightRef.getCheckedKeys(), ...this.$refs.treeRightRef.getHalfCheckedKeys()]
       const keysStr = keys.join(',')
       const { data: res } = await this.$http.post(`roles/${this.roleId}/rights`, { rids: keysStr })

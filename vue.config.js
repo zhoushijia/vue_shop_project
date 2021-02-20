@@ -5,7 +5,7 @@ module.exports = {
     config.when(process.env.NODE_ENV === 'production', (config) => {
       // 选择生产上线入口
       config
-        .entry('app')
+        .entry('app') //?
         .clear()
         .add('./src/main-prod.js')
       // 利用externals排除打包文件
