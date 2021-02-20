@@ -76,6 +76,7 @@ router.beforeEach((to, from, next) => {
   // 如果没有token值或者不正确 跳转到token页面
   if (!tokenStr) return next('/login')
   // 调用后端 核验 token 是否正确
+  // 自定义事件监听路由跳转路径 to.path
   hub.$emit('getActivePath', to.path)
   next()
 })
