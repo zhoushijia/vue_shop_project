@@ -10,9 +10,9 @@
     <el-card>
       <el-alert title="注意：只允许第三级分类设置相关参数" type="warning" :closable="false"> </el-alert>
       <el-row>
-        <el-col>
-          <span>请选择商品分类: </span>
-          <el-cascader :options="catelist" v-model="selectedKeys" :props="cascaderProps" @change="cateParamsChanged"></el-cascader>
+        <el-col :span="3">请选择商品分类: </el-col>
+        <el-col :span="21">
+          <el-cascader :options="catelist" v-model="selectedKeys" :props="cascaderProps" @change="cateParamsChanged" style="width:100%"></el-cascader>
         </el-col>
       </el-row>
       <!-- tab切换 -->
